@@ -1,0 +1,47 @@
+project_name: docserver-controller
+release:
+  disable: true
+builds:
+  - env:
+      - CGO_ENABLED=0
+    main: ./cmd/main.go
+    binary: manager
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+dockers:
+  - image_templates:
+      - "docogawa/docserver-controller:latest-amd64"
+      - "docogawa/docserver-controller:{{ .Version }}-amd64"
+    use: buildx
+    dockerfile: Dockerfile-goreleaser
+    extra_files:
+      - LICENSE
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+  - image_templates:
+      - "docogawa/docserver-controller:latest-arm64"
+      - "docogawa/docserver-controller:{{ .Version }}-arm64"
+    use: buildx
+    dockerfile: Dockerfile-goreleaser
+    extra_files:
+      - LICENSE
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+docker_manifests:
+  - name_template: "docogawa/docserver-controller:latest"
+    image_templates:
+      - "docogawa/docserver-controller:latest-amd64"
+      - "docogawa/docserver-controller:latest-arm64"
+  - name_template: "docogawa/docserver-controller:{{ .Version }}"
+    image_templates:
+      - "docogawa/docserver-controller:{{ .Version }}-amd64"
+      - "docogawa/docserver-controller:{{ .Version }}-arm64"

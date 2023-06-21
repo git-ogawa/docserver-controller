@@ -1,0 +1,10 @@
+---
+apiVersion: update.git-ogawa.github.io/v1beta1
+kind: DocServer
+metadata:
+  name: sample
+spec:
+  target:
+    url: https://github.com/git-ogawa/mkdocs-example.git
+    branch: main
+  replicas: 3

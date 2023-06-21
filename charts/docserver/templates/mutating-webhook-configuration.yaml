@@ -1,0 +1,29 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ include "docserver.fullname" . }}-mutating-webhook-configuration
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "docserver.fullname" . }}-serving-cert
+  labels:
+  {{- include "docserver.labels" . | nindent 4 }}
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "docserver.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-update-git-ogawa-github-io-v1beta1-docserver
+  failurePolicy: Fail
+  name: mdocserver.kb.io
+  rules:
+  - apiGroups:
+    - update.git-ogawa.github.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - docservers
+  sideEffects: None
