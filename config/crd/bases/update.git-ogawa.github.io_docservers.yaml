@@ -1,0 +1,145 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.3
+  creationTimestamp: null
+  name: docservers.update.git-ogawa.github.io
+spec:
+  group: update.git-ogawa.github.io
+  names:
+    kind: DocServer
+    listKind: DocServerList
+    plural: docservers
+    singular: docserver
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.replicas
+      name: REPLICAS
+      type: integer
+    - jsonPath: .status
+      name: STATUS
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    - jsonPath: .spec.target.branch
+      name: BRANCH
+      priority: 1
+      type: string
+    - jsonPath: .spec.target.url
+      name: URL
+      priority: 1
+      type: string
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: DocServer is the Schema for the docservers API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DocServerSpec defines the desired state of DocServer
+            properties:
+              gitpod:
+                description: Gitpod is the properties of gitpod pods.
+                properties:
+                  image:
+                    description: Image is the name:tag of the image used by the gitpod
+                      container.
+                    type: string
+                type: object
+              image:
+                description: Image is the name:tag of the image used by the docserver
+                  container.
+                type: string
+              replicas:
+                default: 1
+                description: Replicas is the number of docserver pod.
+                format: int32
+                type: integer
+              storage:
+                description: Storage is the properties of persistenVolumeClaim.
+                properties:
+                  blockOwnerDeletion:
+                    description: BlockOwnerDeletion is the value of BlockOwnerDeletion
+                      of persistenVolumeClaim.
+                    type: boolean
+                  size:
+                    description: Size is the volume capacity requested by persistenVolumeClaim.
+                    type: string
+                  storageClass:
+                    default: default
+                    description: StorageClass is StorageClassName of persistenVolumeClaim.
+                    type: string
+                type: object
+              target:
+                description: Target is the properties used when pull the source of
+                  the document from a git repository.
+                properties:
+                  basicAuthSecret:
+                    description: BasicAuthSecret is the name of secret used when try
+                      basic authentication to pull the sources from the repository.
+                    type: string
+                  branch:
+                    default: main
+                    description: Branch is the branch name to be pulled.
+                    type: string
+                  depth:
+                    default: 1
+                    description: Depth is the depth to create shallow clone.
+                    type: integer
+                  sshSecret:
+                    description: SSHSecret is the name of secret used when using basic
+                      authentication to pull the sources from the repository.
+                    properties:
+                      config:
+                        description: Config is the name of configmap where ssh config
+                          is stored,
+                        type: string
+                      privatekey:
+                        description: PrivateKey is the name of secret where ssh private-key
+                          is stored.
+                        type: string
+                    type: object
+                  sslVerify:
+                    description: SSLVerify is the flag whether or not to check host
+                      identify when pull the source from the repository.
+                    type: boolean
+                  tlsSecret:
+                    description: TLSSecret is the name of secret used when using try
+                      tls to pull the sources from the repository.
+                    type: string
+                  url:
+                    description: Url is the url of git repository where the sources
+                      of the document are stored.
+                    pattern: ^(https|ssh).*\.git$
+                    type: string
+                required:
+                - url
+                type: object
+            type: object
+          status:
+            description: DocServerStatus defines the observed state of DocServer
+            enum:
+            - NotReady
+            - Available
+            - Healthy
+            type: string
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
